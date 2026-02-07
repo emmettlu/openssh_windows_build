@@ -19,11 +19,6 @@ jobs:
           ref: refs/tags/v9.8.3.0
           path: openssh-portable
 
-      # - name: Setup MSBuild
-      #   uses: microsoft/setup-msbuild@v2
-      #   with:
-      #     msbuild-architecture: x64
-
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
         uses: ilammy/msvc-dev-cmd@v1
@@ -35,14 +30,15 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          cd ${{ github.workspace }}\openssh-portable
-          Import-Module .\contrib\win32\openssh\OpenSSHBuildHelper.psm1 -Force
+          $solutionFile = Join-Path $contribDir "Win32-OpenSSH.sln"
+          msbuild $solutionFile `
+            /nologo `
+            /t:Rebuild `
+            /p:Platform=x64 `
+            /p:Configuration=Release `
+            /p:PlatformToolset=v142
 
-          Start-OpenSSHBuild -Configuration Release -NativeHostArch x64
-
-          Start-OpenSSHPackage -Configuration Release -NativeHostArch x64
-
-      - name: Copy libcrypto.dll (first build or new version)
+      - name: Copy libcrypto.dll
         shell: pwsh
         run: |
           $sourcePath = "${{ github.workspace }}\openssh-portable\contrib\win32\openssh\libressl\bin\desktop\x64\libcrypto.dll"
