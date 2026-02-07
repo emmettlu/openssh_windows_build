@@ -36,7 +36,8 @@ jobs:
             /t:Rebuild `
             /p:Platform=x64 `
             /p:Configuration=Release `
-            /p:PlatformToolset=v142
+
+      # /p:PlatformToolset=v142
 
       - name: Copy libcrypto.dll
         shell: pwsh
