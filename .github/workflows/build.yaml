@@ -12,7 +12,7 @@ jobs:
         os: [windows-2022]
 
     steps:
-      - name: Checkout OpenSSH source
+      - name: Checkout OpenSSH
         uses: actions/checkout@v6
         with:
           repository: PowerShell/openssh-portable
@@ -38,17 +38,15 @@ jobs:
           cd ${{ github.workspace }}\openssh-portable
           Import-Module .\contrib\win32\openssh\OpenSSHBuildHelper.psm1 -Force
 
-          Write-Host "Building OpenSSH for ${{ matrix.arch }} ${{ matrix.config }}..."
-          Start-OpenSSHBuild -Configuration ${{ matrix.config }} -NativeHostArch ${{ matrix.arch }}
+          Start-OpenSSHBuild -Configuration Release -NativeHostArch x64
 
-          Write-Host "Packaging OpenSSH..."
-          Start-OpenSSHPackage -Configuration ${{ matrix.config }} -NativeHostArch ${{ matrix.arch }}
+          Start-OpenSSHPackage -Configuration Release -NativeHostArch x64
 
       - name: Copy libcrypto.dll (first build or new version)
         shell: pwsh
         run: |
-          $sourcePath = "${{ github.workspace }}\openssh-portable\contrib\win32\openssh\libressl\bin\desktop\${{ matrix.arch }}\libcrypto.dll"
-          $destPath = "${{ github.workspace }}\openssh-portable\bin\${{ matrix.arch }}\${{ matrix.config }}"
+          $sourcePath = "${{ github.workspace }}\openssh-portable\contrib\win32\openssh\libressl\bin\desktop\x64\libcrypto.dll"
+          $destPath = "${{ github.workspace }}\openssh-portable\bin\x64\Release"
 
           if (Test-Path $sourcePath) {
             Write-Host "Copying libcrypto.dll from $sourcePath to $destPath"
