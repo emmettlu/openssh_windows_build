@@ -19,12 +19,16 @@ jobs:
           ref: refs/tags/v9.8.3.0
           path: openssh-portable
 
-      - name: Download vs_buildtools 2019 and add v142 Spectre
+      - name: Modify with log
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -OutFile "vs_buildtools.exe"
           ./vs_buildtools.exe modify --quiet --wait --norestart `
-            --add Microsoft.VisualStudio.Component.VC.v142.x86.x64.Spectre
+            --add Microsoft.VisualStudio.Component.VC.v142.x86.x64.Spectre `
+            --log vs_modify.log
+          Write-Host "Exit code: $LASTEXITCODE"
+          if (Test-Path vs_modify.log) { Get-Content vs_modify.log -Tail 50 }
+          Remove-Item ./vs_buildtools.exe -Force
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
