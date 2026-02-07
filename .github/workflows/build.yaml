@@ -19,14 +19,12 @@ jobs:
           ref: refs/tags/v9.8.3.0
           path: openssh-portable
 
-      - name: Modify VS Build Tools - Add v142 Spectre mitigated libs
+      - name: Modify - Add v142 Spectre
         shell: cmd
         run: |
           "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" modify ^
-            --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools" ^
             --quiet --wait --norestart ^
-            --add Microsoft.VisualStudio.Component.VC.v142.x86.x64.Spectre ^
-            --add Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64.Spectre
+            --add Microsoft.VisualStudio.Component.VC.v142.x86.x64.Spectre
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
