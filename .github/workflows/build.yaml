@@ -19,6 +19,14 @@ jobs:
           ref: refs/tags/v9.8.3.0
           path: openssh-portable
 
+      - name: Check VS Installer status with vswhere
+        shell: pwsh
+        run: |
+          $vswhere = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
+          & $vswhere -latest -format json | ConvertFrom-Json | Select-Object -ExpandProperty instanceId, installationPath, installationVersion, productId, channelId
+          & $vswhere -all -legacy -format json | ConvertFrom-Json
+          # 如果有 v142，會顯示相關 toolset
+
       - name: Modify - Add v142 Spectre
         shell: cmd
         run: |
