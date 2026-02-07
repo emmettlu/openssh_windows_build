@@ -23,9 +23,25 @@ jobs:
         shell: pwsh
         run: |
           $vswhere = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
-          & $vswhere -latest -format json | ConvertFrom-Json | Select-Object -ExpandProperty instanceId, installationPath, installationVersion, productId, channelId
-          & $vswhere -all -legacy -format json | ConvertFrom-Json
-          # 如果有 v142，會顯示相關 toolset
+
+          # Show the latest instance details (nicely formatted)
+          Write-Host "Latest instance:"
+          & $vswhere -latest -format json | ConvertFrom-Json |
+            Select-Object instanceId, installationPath, installationVersion, productId, channelId |
+            Format-List
+
+          # Show ALL instances (including legacy/Build Tools)
+          Write-Host "`nAll instances (including legacy):"
+          & $vswhere -all -legacy -format json | ConvertFrom-Json |
+            Select-Object instanceId, installationPath, installationVersion, productId, channelId |
+            Format-Table -AutoSize
+
+          # Bonus: Check for v142 toolset components (if any instance has them)
+          Write-Host "`nInstances with v142 toolset:"
+          & $vswhere -all -legacy -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -format json |
+            ConvertFrom-Json |
+            Select-Object -Property installationPath, installationVersion |
+            Format-Table -AutoSize
 
       - name: Modify - Add v142 Spectre
         shell: cmd
