@@ -22,17 +22,36 @@ jobs:
       - name: Install MSVC v142 Spectre-mitigated libs
         shell: powershell
         run: |
-          $vsInstaller = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
+          # 先找到 vs_installer
+          $vsInstaller = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
 
-          & $vsInstaller modify `
-            --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" `
-            --add Microsoft.VisualStudio.Component.VC.14.29.x86.x64.Spectre `
-            --quiet --norestart --wait
-
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to install Spectre-mitigated libraries"
+          if (-not (Test-Path $vsInstaller)) {
+            Write-Error "VS Installer not found at: $vsInstaller"
             exit 1
           }
+
+          Write-Host "Found VS Installer: $vsInstaller"
+
+          # 尝试安装 v142 Spectre 组件
+          $process = Start-Process -FilePath $vsInstaller -ArgumentList @(
+            "modify",
+            "--installPath", "`"C:\Program Files\Microsoft Visual Studio\2022\Enterprise`"",
+            "--add", "Microsoft.VisualStudio.Component.VC.14.29.x86.x64.Spectre",
+            "--add", "Microsoft.VisualStudio.Component.VC.14.29.ARM.Spectre",
+            "--quiet",
+            "--norestart",
+            "--wait"
+          ) -Wait -PassThru
+
+          Write-Host "Exit code: $($process.ExitCode)"
+
+          # 0 = success, 3010 = success but restart required
+          if ($process.ExitCode -notin @(0, 3010)) {
+            Write-Error "Failed to install Spectre-mitigated libraries, exit code: $($process.ExitCode)"
+            exit 1
+          }
+
+          Write-Host "Spectre libs installed successfully"
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
