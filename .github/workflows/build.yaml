@@ -19,32 +19,14 @@ jobs:
           ref: refs/tags/v9.8.3.0
           path: openssh-portable
 
-      - name: Install MSVC v142 Spectre-mitigated libs
-        shell: powershell
+      - name: Modify VS Build Tools - Add v142 Spectre mitigated libs
+        shell: cmd
         run: |
-          $vsInstaller = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
-
-          Write-Host "Installing v142 Spectre-mitigated libraries..."
-
-          $process = Start-Process -FilePath $vsInstaller -ArgumentList @(
-            "modify",
-            "--installPath", "`"C:\Program Files\Microsoft Visual Studio\2022\Enterprise`"",
-            "--add", "Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64.Spectre",
-            "--add", "Microsoft.VisualStudio.Component.VC.14.29.16.11.ARM64.Spectre",
-            "--quiet",
-            "--norestart",
-            "--wait"
-          ) -Wait -PassThru -NoNewWindow
-
-          Write-Host "Exit code: $($process.ExitCode)"
-
-          # 0 = success, 3010 = success but restart required
-          if ($process.ExitCode -notin @(0, 3010)) {
-            Write-Error "Failed to install Spectre-mitigated libraries, exit code: $($process.ExitCode)"
-            exit 1
-          }
-
-          Write-Host "[OK] Spectre libs installed successfully"
+          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" modify ^
+            --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools" ^
+            --quiet --wait --norestart ^
+            --add Microsoft.VisualStudio.Component.VC.v142.x86.x64.Spectre ^
+            --add Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64.Spectre
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
