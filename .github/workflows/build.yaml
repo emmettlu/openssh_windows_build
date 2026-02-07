@@ -4,21 +4,12 @@ on:
   workflow_dispatch:
   push:
 
-env:
-  VCPKG_ROOT: ${{ github.workspace }}\vcpkg
-
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        arch: [x64, x86, ARM64]
-        config: [Release]
-        exclude:
-          # 如果需要可以排除某些组合以节省资源
-          - arch: ARM64
-            config: Debug
+        os: [windows-2022]
 
     steps:
       - name: Checkout OpenSSH source
@@ -33,14 +24,15 @@ jobs:
       #   with:
       #     msbuild-architecture: x64
 
-      # - name: Setup vcpkg
-      #   run: |
-      #     git clone --depth 1 https://github.com/Microsoft/vcpkg.git $env:VCPKG_ROOT
-      #     cd $env:VCPKG_ROOT
-      #     .\bootstrap-vcpkg.bat
-      #     .\vcpkg.exe integrate install
+      - name: Setup MSVC
+        if: matrix.os == 'windows-2022'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: 14.29
+          arch: x64
+          sdk: 10.0.19041.0
 
-      - name: Build OpenSSH (${{ matrix.arch }} ${{ matrix.config }})
+      - name: Build
         shell: pwsh
         run: |
           cd ${{ github.workspace }}\openssh-portable
@@ -65,18 +57,9 @@ jobs:
             Write-Host "libcrypto.dll not found at expected path, skipping copy"
           }
 
-      - name: Upload build artifacts (binaries)
-        uses: actions/upload-artifact@v4
+      - name: Archive
+        uses: actions/upload-artifact@v5
         with:
-          name: openssh-${{ matrix.arch }}-${{ matrix.config }}
+          name: openssh-${{ runner.os }}
           path: |
-            openssh-portable/bin/${{ matrix.arch }}/${{ matrix.config }}/
-          retention-days: 30
-
-      - name: Upload packaged zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: openssh-package-${{ matrix.arch }}-${{ matrix.config }}
-          path: |
-            openssh-portable/*.zip
-          retention-days: 30
+            openssh-portable/bin/x64/Release/
