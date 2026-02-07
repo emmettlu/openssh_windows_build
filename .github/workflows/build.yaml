@@ -25,7 +25,6 @@ jobs:
           Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -OutFile "vs_buildtools.exe"
           ./vs_buildtools.exe modify --quiet --wait --norestart `
             --add Microsoft.VisualStudio.Component.VC.v142.x86.x64.Spectre
-          Remove-Item ./vs_buildtools.exe -Force
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
