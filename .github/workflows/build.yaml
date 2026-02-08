@@ -40,7 +40,7 @@ jobs:
       - name: Archive LibreSSL
         uses: actions/upload-artifact@v5
         with:
-          name: openssh-${{ runner.os }}
+          name: libressl_${{ runner.os }}
           path: |
             ${{ github.workspace }}/libressl-install
 
@@ -78,7 +78,7 @@ jobs:
       - name: Archive OpenSSH
         uses: actions/upload-artifact@v5
         with:
-          name: openssh-${{ runner.os }}
+          name: openssh_${{ runner.os }}
           path: |
             openssh-portable/bin/x64/Release/*.dll
             openssh-portable/bin/x64/Release/*.exe
