@@ -31,9 +31,18 @@ jobs:
         shell: pwsh
         working-directory: libressl
         run: |
-          cmake -S . -B build_nmake -G "NMake Makefiles"
+          $installPrefix = "${{ github.workspace }}\libressl-install"
+          cmake -S . -B build_nmake -G "NMake Makefiles" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="$installPrefix"
           cmake --build build_nmake
-          tree build_nmake
+          cmake --install build_nmake
+          tree "$installPrefix"
+
+      - name: Archive LibreSSL
+        uses: actions/upload-artifact@v5
+        with:
+          name: openssh-${{ runner.os }}
+          path: |
+            ${{ github.workspace }}/libressl-install
 
       - name: Checkout Self
         uses: actions/checkout@v6
@@ -66,20 +75,7 @@ jobs:
             /p:Optimization=MinSpace `
             /p:FunctionLevelLinking=true
 
-      - name: Copy libcrypto.dll
-        shell: pwsh
-        run: |
-          $sourcePath = "${{ github.workspace }}\openssh-portable\contrib\win32\openssh\libressl\bin\desktop\x64\libcrypto.dll"
-          $destPath = "${{ github.workspace }}\openssh-portable\bin\x64\Release"
-
-          if (Test-Path $sourcePath) {
-            Write-Host "Copying libcrypto.dll from $sourcePath to $destPath"
-            Copy-Item $sourcePath $destPath -Force
-          } else {
-            Write-Host "libcrypto.dll not found at expected path, skipping copy"
-          }
-
-      - name: Archive
+      - name: Archive OpenSSH
         uses: actions/upload-artifact@v5
         with:
           name: openssh-${{ runner.os }}
