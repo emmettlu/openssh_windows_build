@@ -12,6 +12,9 @@ jobs:
         os: [windows-2022]
 
     steps:
+      - name: Checkout Self
+        uses: actions/checkout@v6
+
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
         uses: ilammy/msvc-dev-cmd@v1
@@ -31,11 +34,12 @@ jobs:
         shell: pwsh
         working-directory: libressl
         run: |
+          Remove-Item CMakeLists.txt -Force
+          Move-Item ../CMakeLists.txt . -Force
           $installPrefix = "${{ github.workspace }}\libressl-install"
-          cmake -S . -B build_nmake -G "NMake Makefiles" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="$installPrefix"
-          cmake --build build_nmake
+          cmake -S . -B build_nmake -G "NMake Makefiles" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="$installPrefix" -DCMAKE_BUILD_TYPE=Release
+          cmake --build build_nmake --config Release
           cmake --install build_nmake
-          tree "$installPrefix"
 
       - name: Archive LibreSSL
         uses: actions/upload-artifact@v5
@@ -43,9 +47,6 @@ jobs:
           name: libressl_${{ runner.os }}
           path: |
             ${{ github.workspace }}/libressl-install
-
-      - name: Checkout Self
-        uses: actions/checkout@v6
 
       - name: Checkout OpenSSH
         uses: actions/checkout@v6
