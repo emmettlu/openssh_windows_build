@@ -29,14 +29,13 @@ jobs:
           toolset: 14.29
           arch: x64
           sdk: 10.0.19041.0
-          # spectre: true
 
       - name: Modify with log
         shell: pwsh
         run: |
           7z x spectre.7z -o"$env:VCToolsInstallDir\lib"
-          ls "$env:VCToolsInstallDir\lib"
-          $env:LIBPATH = "$env:LIBPATH;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.29.30133\lib\spectre\x64"
+          ls ""
+          $env:LIBPATH = "$env:VCToolsInstallDir\lib\spectre\x64;" + $env:LIBPATH
 
       - name: Build
         shell: pwsh
@@ -67,4 +66,5 @@ jobs:
         with:
           name: openssh-${{ runner.os }}
           path: |
-            openssh-portable/bin/x64/Release/
+            openssh-portable/bin/x64/Release/*.dll
+            openssh-portable/bin/x64/Release/*.exe
