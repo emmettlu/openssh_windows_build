@@ -12,6 +12,22 @@ jobs:
         os: [windows-2022]
 
     steps:
+      - name: Checkout LibreSSL
+        uses: actions/checkout@v6
+        with:
+          repository: PowerShell/LibreSSL
+          ref: refs/tags/V4.0.0.0
+          path: libressl
+
+      - name: Build LibreSSL
+        shell: bash
+        working-directory: libressl
+        run: |
+          ./configure
+          ls -l
+          ls -l | grep -i makefile
+          exit 1
+
       - name: Checkout Self
         uses: actions/checkout@v6
 
