@@ -12,6 +12,14 @@ jobs:
         os: [windows-2022]
 
     steps:
+      - name: Setup MSVC
+        if: matrix.os == 'windows-2022'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: 14.29
+          arch: x64
+          sdk: 10.0.19041.0
+
       - name: Checkout LibreSSL
         uses: actions/checkout@v6
         with:
@@ -23,10 +31,8 @@ jobs:
         shell: bash
         working-directory: libressl
         run: |
-          ./configure
-          ls -l
-          ls -l | grep -i makefile
-          exit 1
+          cmake -S . -B build_nmake -G "NMake Makefiles"
+          cmake --build build_nmake
 
       - name: Checkout Self
         uses: actions/checkout@v6
@@ -37,14 +43,6 @@ jobs:
           repository: PowerShell/openssh-portable
           ref: refs/tags/v9.8.3.0
           path: openssh-portable
-
-      - name: Setup MSVC
-        if: matrix.os == 'windows-2022'
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          toolset: 14.29
-          arch: x64
-          sdk: 10.0.19041.0
 
       - name: Modify with log
         shell: pwsh
