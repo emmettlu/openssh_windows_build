@@ -12,6 +12,9 @@ jobs:
         os: [windows-2022]
 
     steps:
+      - name: Checkout Self
+        uses: actions/checkout@v6
+
       - name: Checkout OpenSSH
         uses: actions/checkout@v6
         with:
