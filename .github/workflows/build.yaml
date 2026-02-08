@@ -26,6 +26,8 @@ jobs:
         shell: pwsh
         run: |
           7z x spectre.7z -o"$env:VCToolsInstallDir\lib"
+          ls "$env:VCToolsInstallDir\lib"
+          $env:LIBPATH = "$env:LIBPATH;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.29.30133\lib\spectre\x64"
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
