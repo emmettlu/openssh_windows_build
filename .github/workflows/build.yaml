@@ -28,11 +28,12 @@ jobs:
           path: libressl
 
       - name: Build LibreSSL
-        shell: bash
+        shell: pwsh
         working-directory: libressl
         run: |
           cmake -S . -B build_nmake -G "NMake Makefiles"
           cmake --build build_nmake
+          tree build_nmake
 
       - name: Checkout Self
         uses: actions/checkout@v6
@@ -59,6 +60,7 @@ jobs:
             /t:Rebuild `
             /p:Platform=x64 `
             /p:Configuration=Release `
+            /p:WindowsTargetPlatformVersion=10.0.19041.0 `
             /p:PlatformToolset=v142 `
             /p:WholeProgramOptimization=true `
             /p:Optimization=MinSpace `
