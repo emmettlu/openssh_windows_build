@@ -34,7 +34,6 @@ jobs:
         shell: pwsh
         run: |
           7z x spectre.7z -o"$env:VCToolsInstallDir\lib"
-          ls ""
           $env:LIBPATH = "$env:VCToolsInstallDir\lib\spectre\x64;" + $env:LIBPATH
 
       - name: Build
@@ -46,7 +45,10 @@ jobs:
             /t:Rebuild `
             /p:Platform=x64 `
             /p:Configuration=Release `
-            /p:PlatformToolset=v142
+            /p:PlatformToolset=v142 `
+            /p:WholeProgramOptimization=true `
+            /p:Optimization=MinSpace `
+            /p:FunctionLevelLinking=true
 
       - name: Copy libcrypto.dll
         shell: pwsh
