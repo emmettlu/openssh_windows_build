@@ -23,9 +23,9 @@ jobs:
           path: openssh-portable
 
       - name: Modify with log
-        shell: cmd
+        shell: pwsh
         run: |
-          7z x spectre.7z -o "%VCToolsInstallDir%\lib"
+          7z x spectre.7z -o"$env:VCToolsInstallDir\lib"
 
       - name: Setup MSVC
         if: matrix.os == 'windows-2022'
